@@ -3,8 +3,10 @@ package com.incidentmanager.service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,9 +16,12 @@ import com.incidentmanager.dto.request.IncidentUpdateRequest;
 import com.incidentmanager.dto.response.IncidentResponse;
 import com.incidentmanager.entity.Incident;
 import com.incidentmanager.enums.Status;
+import com.incidentmanager.enums.Priority;
 import com.incidentmanager.mapper.IncidentMapper;
 import com.incidentmanager.repository.IncidentRepository;
+import com.incidentmanager.repository.specification.IncidentSpecifications;
 import com.incidentmanager.repository.UserRepository;
+import com.incidentmanager.util.IncidentSort;
 
 @Service
 public class IncidentService {
@@ -59,6 +64,21 @@ public class IncidentService {
     public IncidentResponse getById(UUID id) {
         Incident incident = incidentRepository.findIncidentById(id);
         return incidentMapper.toResponse(incident);
+    }
+
+    public Page<IncidentResponse> search(
+        Status status,
+        Priority prioridade,
+        String query,
+        int page,
+        int size,
+        String sort) {
+
+        Pageable pageable = PageRequest.of(page, size, IncidentSort.parse(sort));
+
+        return incidentRepository.findAll(
+            IncidentSpecifications.buildIncidentFilter(status, prioridade, query), pageable)
+        .map(incidentMapper::toResponse);
     }
     
     public IncidentResponse update(UUID id, IncidentUpdateRequest request) {
