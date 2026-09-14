@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.access.AccessDeniedException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -60,6 +61,13 @@ public class GlobalExceptionHandler {
 		return buildResponse(ex.getStatusCode(), request, ex.getReason(), Map.of());
 	}
 
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<ApiError> handleAccessDeniedException(
+	        AccessDeniedException ex,
+	        HttpServletRequest request) {
+	    return buildResponse(HttpStatus.FORBIDDEN, request, "Access denied", Map.of());
+	}
+
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<ApiError> handleMethodArgumentTypeMismatch(
 			MethodArgumentTypeMismatchException ex,
@@ -75,7 +83,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiError> handleException(Exception ex, HttpServletRequest request) {
 		return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, request, ex.getMessage(), Map.of());
 	}
-	
+
 	private ResponseEntity<ApiError> buildResponse(
 			HttpStatusCode status,
 			HttpServletRequest request,

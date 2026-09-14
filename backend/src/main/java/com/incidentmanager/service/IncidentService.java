@@ -74,6 +74,11 @@ public class IncidentService {
         return incidentMapper.toResponse(updatedIncident);
     }
 
+    public void delete(UUID id) {
+        Incident incident = findIncidentById(id);
+        incidentRepository.delete(incident);
+    }
+
     private Incident findIncidentById(UUID id) {
         return incidentRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(

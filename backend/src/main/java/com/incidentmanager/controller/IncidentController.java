@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.incidentmanager.dto.request.IncidentCreateRequest;
@@ -55,6 +56,13 @@ public class IncidentController {
         IncidentResponse response = incidentService.update(id, request);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasAuthority('WRITER')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        incidentService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
