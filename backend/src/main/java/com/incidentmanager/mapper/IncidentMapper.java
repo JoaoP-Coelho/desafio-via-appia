@@ -9,6 +9,7 @@ import com.incidentmanager.dto.response.CommentResponse;
 import com.incidentmanager.dto.response.IncidentResponse;
 import com.incidentmanager.entity.Comment;
 import com.incidentmanager.entity.Incident;
+import com.incidentmanager.util.TagUtils;
 
 @Component
 public class IncidentMapper {
@@ -19,7 +20,7 @@ public class IncidentMapper {
         incident.setDescricao(request.descricao());
         incident.setPriority(request.prioridade());
         incident.setResponsavelEmail(request.responsavelEmail());
-        incident.setTags(request.tags());
+        incident.setTags(TagUtils.normalizeTags(request.tags()));
         return incident;
     }
 
@@ -60,7 +61,7 @@ public class IncidentMapper {
         incident.setDescricao(request.descricao());
         incident.setPriority(request.prioridade());
         incident.setStatus(request.status());
-        incident.setTags(request.tags());
+        incident.setTags(TagUtils.normalizeTags(request.tags()));
     }
 
 }
