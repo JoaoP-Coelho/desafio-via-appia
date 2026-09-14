@@ -1,10 +1,13 @@
 package com.incidentmanager.service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.incidentmanager.dto.request.IncidentCreateRequest;
 import com.incidentmanager.dto.response.IncidentResponse;
@@ -51,4 +54,13 @@ public class IncidentService {
         Incident savedIncident = incidentRepository.save(incident);
         return incidentMapper.toResponse(savedIncident);
     }
+
+    public IncidentResponse getById(UUID id) {
+        Incident incident = incidentRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Incident not found with id: " + id));
+        return incidentMapper.toResponse(incident);
+    }
+    
 }
