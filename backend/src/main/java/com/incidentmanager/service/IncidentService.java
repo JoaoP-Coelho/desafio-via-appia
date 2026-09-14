@@ -57,13 +57,13 @@ public class IncidentService {
     }
 
     public IncidentResponse getById(UUID id) {
-        Incident incident = findIncidentById(id);
+        Incident incident = incidentRepository.findIncidentById(id);
         return incidentMapper.toResponse(incident);
     }
     
     public IncidentResponse update(UUID id, IncidentUpdateRequest request) {
 
-        Incident incident = findIncidentById(id);
+        Incident incident = incidentRepository.findIncidentById(id);
 
         incidentMapper.updateEntity(incident, request);
 
@@ -75,15 +75,8 @@ public class IncidentService {
     }
 
     public void delete(UUID id) {
-        Incident incident = findIncidentById(id);
+        Incident incident = incidentRepository.findIncidentById(id);
         incidentRepository.delete(incident);
-    }
-
-    private Incident findIncidentById(UUID id) {
-        return incidentRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "Incident not found with id: " + id));
     }
 
 }
