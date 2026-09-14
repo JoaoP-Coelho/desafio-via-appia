@@ -4,7 +4,10 @@ import org.springframework.stereotype.Component;
 
 import com.incidentmanager.dto.request.IncidentCreateRequest;
 import com.incidentmanager.dto.request.IncidentUpdateRequest;
+import com.incidentmanager.dto.request.CommentCreateRequest;
+import com.incidentmanager.dto.response.CommentResponse;
 import com.incidentmanager.dto.response.IncidentResponse;
+import com.incidentmanager.entity.Comment;
 import com.incidentmanager.entity.Incident;
 
 @Component
@@ -33,6 +36,22 @@ public class IncidentMapper {
             incident.getTags(),
             incident.getDataAbertura(),
             incident.getDataAtualizacao()
+        );
+    }
+
+    public Comment toEntity(CommentCreateRequest request) {
+        Comment comment = new Comment();
+        comment.setMensagem(request.mensagem());
+        return comment;
+    }
+
+    public CommentResponse toResponse(Comment comment) {
+        return new CommentResponse(
+            comment.getId(),
+            comment.getIncident().getId(),
+            comment.getAutor().getNome(),
+            comment.getMensagem(),
+            comment.getDataCriacao()
         );
     }
 
