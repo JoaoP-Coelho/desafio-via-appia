@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.incidentmanager.dto.request.IncidentCreateRequest;
+import com.incidentmanager.dto.request.IncidentUpdateRequest;
 import com.incidentmanager.dto.response.IncidentResponse;
 import com.incidentmanager.entity.Incident;
 import com.incidentmanager.enums.Status;
@@ -63,4 +64,20 @@ public class IncidentService {
         return incidentMapper.toResponse(incident);
     }
     
+    public IncidentResponse update(UUID id, IncidentUpdateRequest request) {
+
+        Incident incident = incidentRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Incident not found with id: " + id));
+
+        incidentMapper.updateEntity(incident, request);
+
+        incident.setDataAtualizacao(LocalDateTime.now());
+
+        Incident updatedIncident = incidentRepository.save(incident);
+
+        return incidentMapper.toResponse(updatedIncident);
+    }
+
 }

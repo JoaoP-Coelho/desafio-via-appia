@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.incidentmanager.dto.request.IncidentCreateRequest;
+import com.incidentmanager.dto.request.IncidentUpdateRequest;
 import com.incidentmanager.dto.response.IncidentResponse;
 import com.incidentmanager.service.IncidentService;
 
@@ -43,4 +45,16 @@ public class IncidentController {
         IncidentResponse incidentResponse = incidentService.getById(id);
         return ResponseEntity.ok(incidentResponse);
     }
+
+    @PreAuthorize("hasAuthority('WRITER')")
+    @PutMapping("/{id}")
+    public ResponseEntity<IncidentResponse> update(
+            @PathVariable UUID id,
+            @Valid @RequestBody IncidentUpdateRequest request) {
+
+        IncidentResponse response = incidentService.update(id, request);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

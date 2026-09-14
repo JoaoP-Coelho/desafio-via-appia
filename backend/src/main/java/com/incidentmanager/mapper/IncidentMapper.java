@@ -3,6 +3,7 @@ package com.incidentmanager.mapper;
 import org.springframework.stereotype.Component;
 
 import com.incidentmanager.dto.request.IncidentCreateRequest;
+import com.incidentmanager.dto.request.IncidentUpdateRequest;
 import com.incidentmanager.dto.response.IncidentResponse;
 import com.incidentmanager.entity.Incident;
 
@@ -34,4 +35,13 @@ public class IncidentMapper {
             incident.getDataAtualizacao()
         );
     }
+
+    public void updateEntity(Incident incident, IncidentUpdateRequest request) {
+        incident.setTitulo(request.titulo());
+        incident.setDescricao(request.descricao());
+        incident.setPriority(request.prioridade());
+        incident.setStatus(request.status());
+        incident.setTags(request.tags());
+    }
+
 }
