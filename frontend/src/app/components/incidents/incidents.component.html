@@ -1,3 +1,58 @@
 <main class="incidents-page">
-  <p>Usuário logado</p>
+  <section class="incidents-content" aria-labelledby="incidents-title">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Overview</p>
+        <h1 id="incidents-title">Incidents</h1>
+      </div>
+      @if (totalElements() > 0) {
+        <span class="total">{{ totalElements()}} registros</span>
+      }
+    </header>
+
+    @if (isLoading()) {
+      <p class="feedback">Carregando incidents...</p>
+    } @else if (errorMessage()) {
+      <p class="feedback error" role="alert">{{ errorMessage() }}</p>
+    } @else if (incidents().length === 0) {
+      <p class="feedback">Nenhum incident encontrado.</p>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Título</th>
+              <th scope="col">Prioridade</th>
+              <th scope="col">Status</th>
+              <th scope="col">Data</th>
+              <th scope="col"><span class="visually-hidden">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (incident of incidents(); track incident.id) {
+              <tr>
+                <td class="title">{{ incident.titulo }}</td>
+                <td><span class="badge priority-{{ incident.prioridade.toLowerCase() }}">{{ incident.prioridade }}</span></td>
+                <td><span class="badge status-{{ incident.status.toLowerCase() }}">{{ incident.status }}</span></td>
+                <td>{{ incident.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td class="actions">
+                  <button type="button" aria-label="Visualizar incident">Visualizar</button>
+                  <button type="button" aria-label="Editar incident">Editar</button>
+                  <button type="button" aria-label="Excluir incident">Excluir</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="pagination" aria-label="Paginação">
+        <span>Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
+        <div>
+          <button type="button" (click)="previousPage()" [disabled]="currentPage() === 0 || isLoading">Anterior</button>
+          <button type="button" (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading">Próxima</button>
+        </div>
+      </footer>
+    }
+  </section>
 </main>
