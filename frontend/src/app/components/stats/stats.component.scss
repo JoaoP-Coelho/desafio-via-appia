@@ -1,11 +1,7 @@
-:host {
-  display: block;
-}
-
-.incidents-page {
+.stats-page {
   min-height: calc(100dvh - 4.5rem);
   display: grid;
-  place-items: center;
+  place-items: start center;
   background: #f8eeee;
   color: #3a1719;
   font-size: 1.5rem;
