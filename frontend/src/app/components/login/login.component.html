@@ -1,0 +1,44 @@
+<main class="login-page">
+  <section class="login-panel" aria-labelledby="login-title">
+    <p class="app_name">Incident Manager</p>
+    <h1 id="login-title">Acesse sua conta</h1>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+      <label for="username">Usuário</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+        placeholder="seu.usuario"
+      />
+      @if (loginForm.controls.username.touched && loginForm.controls.username.invalid) {
+        <span class="field-error">Informe seu usuário.</span>
+      }
+
+      <label for="password">Senha</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+        placeholder="Sua senha"
+      />
+      @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
+        <span class="field-error">Informe sua senha.</span>
+      }
+
+      @if (errorMessage) {
+        <p class="form-error" role="alert">{{ errorMessage }}</p>
+      }
+
+      @if (successMessage) {
+        <p class="form-success" role="status">{{ successMessage }}</p>
+      }
+
+      <button type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
+      </button>
+    </form>
+  </section>
+</main>

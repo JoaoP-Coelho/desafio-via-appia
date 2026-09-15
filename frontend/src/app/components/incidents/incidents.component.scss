@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.incidents-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: #f8eeee;
+  color: #3a1719;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
