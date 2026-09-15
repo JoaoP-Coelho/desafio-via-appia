@@ -10,6 +10,47 @@
       }
     </header>
 
+    <form class="filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+      <label>
+        Buscar
+        <input type="search" formControlName="q" placeholder="Título ou descrição" />
+      </label>
+
+      <label>
+        Status
+        <select formControlName="status">
+          <option value="">Todos</option>
+          <option value="ABERTA">Aberta</option>
+          <option value="EM_ANDAMENTO">Em andamento</option>
+          <option value="RESOLVIDA">Resolvida</option>
+          <option value="CANCELADA">Cancelada</option>
+        </select>
+      </label>
+
+      <label>
+        Prioridade
+        <select formControlName="prioridade">
+          <option value="">Todas</option>
+          <option value="BAIXA">Baixa</option>
+          <option value="MEDIA">Média</option>
+          <option value="ALTA">Alta</option>
+        </select>
+      </label>
+
+      <label>
+        Por página
+        <select formControlName="size">
+          <option [ngValue]="5">5</option>
+          <option [ngValue]="10">10</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="submit">Filtrar</button>
+        <button type="button" class="secondary" (click)="clearFilters()">Limpar</button>
+      </div>
+    </form>
+
     @if (isLoading()) {
       <p class="feedback">Carregando incidents...</p>
     } @else if (errorMessage()) {
@@ -49,8 +90,8 @@
       <footer class="pagination" aria-label="Paginação">
         <span>Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
         <div>
-          <button type="button" (click)="previousPage()" [disabled]="currentPage() === 0 || isLoading">Anterior</button>
-          <button type="button" (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading">Próxima</button>
+          <button type="button" (click)="previousPage()" [disabled]="currentPage() === 0 || isLoading()">Anterior</button>
+          <button type="button" (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading()">Próxima</button>
         </div>
       </footer>
     }

@@ -1,19 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 
-import { IncidentResponse } from '../../models';
-import { IncidentService } from '../../services/incident.service';
+import { IncidentResponse, Priority, Status } from '../../models';
+import {
+  IncidentSearchParams,
+  IncidentService
+} from '../../services/incident.service';
 
 @Component({
   selector: 'app-incidents',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './incidents.component.html',
   styleUrl: './incidents.component.scss'
 })
 export class IncidentsComponent implements OnInit {
 
+  private readonly formBuilder = inject(FormBuilder);
   private readonly incidentService = inject(IncidentService);
 
   protected incidents = signal<IncidentResponse[]>([]);
@@ -23,7 +28,12 @@ export class IncidentsComponent implements OnInit {
   protected isLoading = signal(false);
   protected errorMessage = signal('');
 
-  private readonly pageSize = 10;
+  protected readonly filterForm = this.formBuilder.nonNullable.group({
+    q: '',
+    status: this.formBuilder.control<Status | ''>(''),
+    prioridade: this.formBuilder.control<Priority | ''>(''),
+    size: 10
+  });
 
   ngOnInit(): void {
     this.loadIncidents();
@@ -34,11 +44,17 @@ export class IncidentsComponent implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.incidentService.search({
+    const values = this.filterForm.getRawValue();
+    const filters: IncidentSearchParams = {
       page: this.currentPage(),
-      size: this.pageSize,
-      sort: 'dataAbertura,desc'
-    }).pipe(
+      size: values.size,
+      sort: 'dataAbertura,desc',
+      q: values.q || undefined,
+      status: values.status || undefined,
+      prioridade: values.prioridade || undefined
+    };
+
+    this.incidentService.search(filters).pipe(
       finalize(() => this.isLoading.set(false))
     ).subscribe({
       next: (page) => {
@@ -58,6 +74,21 @@ export class IncidentsComponent implements OnInit {
         console.error('Erro ao carregar incidents:', error);
       }
     });
+  }
+
+  protected applyFilters(): void {
+    this.currentPage.set(0);
+    this.loadIncidents();
+  }
+
+  protected clearFilters(): void {
+    this.filterForm.reset({
+      q: '',
+      status: '',
+      prioridade: '',
+      size: 10
+    });
+    this.applyFilters();
   }
 
   protected previousPage(): void {
