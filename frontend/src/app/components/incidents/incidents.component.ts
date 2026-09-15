@@ -8,11 +8,12 @@ import {
   IncidentSearchParams,
   IncidentService
 } from '../../services/incident.service';
+import { IncidentModalComponent } from '../incident-modal/incident-modal.component';
 
 @Component({
   selector: 'app-incidents',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, IncidentModalComponent],
   templateUrl: './incidents.component.html',
   styleUrl: './incidents.component.scss'
 })
@@ -27,6 +28,8 @@ export class IncidentsComponent implements OnInit {
   protected totalElements = signal(0);
   protected isLoading = signal(false);
   protected errorMessage = signal('');
+  protected isModalOpen = signal(false);
+  protected selectedIncident = signal<IncidentResponse | null>(null);
 
   protected readonly filterForm = this.formBuilder.nonNullable.group({
     q: '',
@@ -77,6 +80,27 @@ export class IncidentsComponent implements OnInit {
   }
 
   protected applyFilters(): void {
+    this.currentPage.set(0);
+    this.loadIncidents();
+  }
+
+  protected openIncidentModal(): void {
+    this.selectedIncident.set(null);
+    this.isModalOpen.set(true);
+  }
+
+  protected editIncident(incident: IncidentResponse): void {
+    this.selectedIncident.set(incident);
+    this.isModalOpen.set(true);
+  }
+
+  protected closeIncidentModal(): void {
+    this.isModalOpen.set(false);
+  }
+
+  protected handleIncidentCreated(): void {
+    this.isModalOpen.set(false);
+    this.selectedIncident.set(null);
     this.currentPage.set(0);
     this.loadIncidents();
   }

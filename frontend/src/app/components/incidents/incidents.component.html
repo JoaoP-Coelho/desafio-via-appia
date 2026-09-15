@@ -5,9 +5,12 @@
         <p class="eyebrow">Overview</p>
         <h1 id="incidents-title">Incidents</h1>
       </div>
-      @if (totalElements() > 0) {
-        <span class="total">{{ totalElements()}} registros</span>
-      }
+      <div class="header-actions">
+        @if (totalElements() > 0) {
+          <span class="total">{{ totalElements() }} registros</span>
+        }
+        <button class="open-incident" type="button" (click)="openIncidentModal()">Abrir Incident</button>
+      </div>
     </header>
 
     <form class="filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
@@ -78,7 +81,7 @@
                 <td>{{ incident.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</td>
                 <td class="actions">
                   <button type="button" aria-label="Visualizar incident">Visualizar</button>
-                  <button type="button" aria-label="Editar incident">Editar</button>
+                  <button type="button" aria-label="Editar incident" (click)="editIncident(incident)">Editar</button>
                   <button type="button" aria-label="Excluir incident">Excluir</button>
                 </td>
               </tr>
@@ -97,3 +100,11 @@
     }
   </section>
 </main>
+
+@if (isModalOpen()) {
+  <app-incident-modal
+    [incident]="selectedIncident()"
+    (closed)="closeIncidentModal()"
+    (saved)="handleIncidentCreated()"
+  />
+}
