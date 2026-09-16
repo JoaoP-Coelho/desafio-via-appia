@@ -31,6 +31,7 @@ export class IncidentsComponent implements OnInit {
   protected errorMessage = signal('');
   protected isModalOpen = signal(false);
   protected selectedIncident = signal<IncidentResponse | null>(null);
+  protected modalMode = signal<'create' | 'edit' | 'view'>('create');
   protected deletingIncidentId = signal<string | null>(null);
 
   protected readonly filterForm = this.formBuilder.nonNullable.group({
@@ -87,22 +88,33 @@ export class IncidentsComponent implements OnInit {
   }
 
   protected openIncidentModal(): void {
+    this.modalMode.set('create');
     this.selectedIncident.set(null);
     this.isModalOpen.set(true);
   }
 
   protected editIncident(incident: IncidentResponse): void {
+    this.modalMode.set('edit');
+    this.selectedIncident.set(incident);
+    this.isModalOpen.set(true);
+  }
+
+  protected viewIncident(incident: IncidentResponse): void {
+    this.modalMode.set('view');
     this.selectedIncident.set(incident);
     this.isModalOpen.set(true);
   }
 
   protected closeIncidentModal(): void {
     this.isModalOpen.set(false);
+    this.selectedIncident.set(null);
+    this.modalMode.set('create');
   }
 
   protected handleIncidentCreated(): void {
     this.isModalOpen.set(false);
     this.selectedIncident.set(null);
+    this.modalMode.set('create');
     this.currentPage.set(0);
     this.loadIncidents();
   }

@@ -5,6 +5,7 @@ export type { Status } from './enums/status';
 export type { CommentCreateRequest } from './request/comment-create-request';
 export type { IncidentCreateRequest } from './request/incident-create-request';
 export type { IncidentUpdateRequest } from './request/incident-update-request';
+export type { IncidentStatusUpdateRequest } from './request/incident-status-update-request';
 export type { CommentResponse } from './response/comment-response';
 export type { IncidentResponse } from './response/incident-response';
 export type { PageIncidentResponse } from './response/page-incident-response';

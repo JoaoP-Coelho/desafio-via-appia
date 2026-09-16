@@ -80,7 +80,7 @@
                 <td><span class="badge status-{{ incident.status.toLowerCase() }}">{{ incident.status }}</span></td>
                 <td>{{ incident.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</td>
                 <td class="actions">
-                  <button type="button" aria-label="Visualizar incident">Visualizar</button>
+                  <button type="button" aria-label="Visualizar incident" (click)="viewIncident(incident)">Visualizar</button>
                   <button type="button" aria-label="Editar incident" (click)="editIncident(incident)">Editar</button>
                   <button
                     type="button"
@@ -111,6 +111,7 @@
 @if (isModalOpen()) {
   <app-incident-modal
     [incident]="selectedIncident()"
+    [mode]="modalMode()"
     (closed)="closeIncidentModal()"
     (saved)="handleIncidentCreated()"
   />

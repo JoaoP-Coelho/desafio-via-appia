@@ -21,6 +21,7 @@ export class IncidentModalComponent implements OnChanges {
   @Output() closed = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
   @Input() incident: IncidentResponse | null = null;
+  @Input() mode: 'create' | 'edit' | 'view' = 'create';
 
   protected readonly priorities: Priority[] = ['BAIXA', 'MEDIA', 'ALTA'];
   protected readonly statuses: Status[] = ['ABERTA', 'EM_ANDAMENTO', 'RESOLVIDA', 'CANCELADA'];
@@ -37,11 +38,17 @@ export class IncidentModalComponent implements OnChanges {
   protected errorMessage = '';
 
   protected get isEditMode(): boolean {
-    return this.incident !== null;
+    return this.mode === 'edit';
+  }
+
+  protected get isViewMode(): boolean {
+    return this.mode === 'view';
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['incident']) {
+    if (changes['incident'] || changes['mode']) {
+      this.setFormState();
+
       if (this.incident) {
         this.incidentForm.patchValue({
           titulo: this.incident.titulo,
@@ -64,6 +71,27 @@ export class IncidentModalComponent implements OnChanges {
     }
   }
 
+  private setFormState(): void {
+    const controls = this.incidentForm.controls;
+
+    if (this.isViewMode) {
+      controls.titulo.disable();
+      controls.descricao.disable();
+      controls.prioridade.disable();
+      controls.responsavelEmail.disable();
+      controls.tags.disable();
+      controls.status.enable();
+      return;
+    }
+
+    controls.titulo.enable();
+    controls.descricao.enable();
+    controls.prioridade.enable();
+    controls.status.enable();
+    controls.responsavelEmail.enable();
+    controls.tags.enable();
+  }
+
   protected close(): void {
     if (!this.isSubmitting) {
       this.closed.emit();
@@ -81,6 +109,21 @@ export class IncidentModalComponent implements OnChanges {
     const values = this.incidentForm.getRawValue();
     this.isSubmitting = true;
     const tags = values.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+    if (this.isViewMode && this.incident) {
+      this.isSubmitting = true;
+      this.incidentService.updateStatus(this.incident.id, { status: values.status }).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.saved.emit();
+        },
+        error: () => {
+          this.isSubmitting = false;
+          this.errorMessage = 'Não foi possível atualizar o status do incident.';
+        }
+      });
+      return;
+    }
+
     const commonFields = {
       titulo: values.titulo.trim(),
       descricao: values.descricao.trim() || undefined,
@@ -107,5 +150,11 @@ export class IncidentModalComponent implements OnChanges {
           : 'Não foi possível cadastrar o incident.';
       }
     });
+  }
+
+  protected updateStatus(): void {
+    if (this.isViewMode) {
+      this.submit();
+    }
   }
 }

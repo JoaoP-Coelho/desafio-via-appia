@@ -2,26 +2,26 @@
   <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" (click)="$event.stopPropagation()">
     <header class="modal-header">
       <div>
-        <p class="eyebrow">{{ isEditMode ? 'Editar registro' : 'Novo registro' }}</p>
-        <h2 id="modal-title">{{ isEditMode ? 'Editar Incident' : 'Abrir Incident' }}</h2>
+        <p class="eyebrow">{{ isViewMode ? 'Visualização' : (isEditMode ? 'Editar registro' : 'Novo registro') }}</p>
+        <h2 id="modal-title">{{ isViewMode ? 'Visualizar Incident' : (isEditMode ? 'Editar Incident' : 'Abrir Incident') }}</h2>
       </div>
       <button class="close-button" type="button" aria-label="Fechar modal" (click)="close()">&times;</button>
     </header>
 
     <form [formGroup]="incidentForm" (ngSubmit)="submit()" novalidate>
       <label for="titulo">Título</label>
-      <input id="titulo" type="text" formControlName="titulo" placeholder="Descreva o incident" />
+      <input id="titulo" type="text" formControlName="titulo" placeholder="Descreva o incident" [readonly]="isViewMode" />
       @if (incidentForm.controls.titulo.touched && incidentForm.controls.titulo.invalid) {
         <span class="field-error">Informe um título entre 5 e 120 caracteres.</span>
       }
 
       <label for="descricao">Descrição</label>
-      <textarea id="descricao" rows="4" formControlName="descricao" placeholder="Detalhe o que aconteceu"></textarea>
+      <textarea id="descricao" rows="4" formControlName="descricao" placeholder="Detalhe o que aconteceu" [readonly]="isViewMode"></textarea>
 
       <div class="form-grid">
         <div>
           <label for="prioridade">Prioridade</label>
-          <select id="prioridade" formControlName="prioridade">
+          <select id="prioridade" formControlName="prioridade" [disabled]="isViewMode">
             @for (priority of priorities; track priority) {
               <option [value]="priority">{{ priority }}</option>
             }
@@ -30,16 +30,16 @@
 
         <div>
           <label for="responsavelEmail">E-mail do responsável</label>
-          <input id="responsavelEmail" type="email" formControlName="responsavelEmail" placeholder="responsavel@empresa.com" />
+          <input id="responsavelEmail" type="email" formControlName="responsavelEmail" placeholder="responsavel@empresa.com" [readonly]="isViewMode" />
           @if (incidentForm.controls.responsavelEmail.touched && incidentForm.controls.responsavelEmail.invalid) {
             <span class="field-error">Informe um e-mail válido.</span>
           }
         </div>
 
-        @if (isEditMode) {
+        @if (isEditMode || isViewMode) {
           <div>
             <label for="status">Status</label>
-            <select id="status" formControlName="status">
+            <select id="status" formControlName="status" (change)="updateStatus()">
               @for (status of statuses; track status) {
                 <option [value]="status">{{ status }}</option>
               }
@@ -49,7 +49,7 @@
       </div>
 
       <label for="tags">Tags</label>
-      <input id="tags" type="text" formControlName="tags" placeholder="produção, acesso, urgente" />
+      <input id="tags" type="text" formControlName="tags" placeholder="produção, acesso, urgente" [readonly]="isViewMode" />
       <small>Separe as tags por vírgula.</small>
 
       @if (errorMessage) {
@@ -57,10 +57,14 @@
       }
 
       <footer class="modal-actions">
-        <button class="secondary" type="button" [disabled]="isSubmitting" (click)="close()">Cancelar</button>
-        <button class="primary" type="submit" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'Salvando...' : (isEditMode ? 'Salvar alterações' : 'Abrir Incident') }}
-        </button>
+        @if (!isViewMode) {
+          <button class="secondary" type="button" [disabled]="isSubmitting" (click)="close()">Cancelar</button>
+          <button class="primary" type="submit" [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Salvando...' : (isEditMode ? 'Salvar alterações' : 'Abrir Incident') }}
+          </button>
+        } @else {
+          <button class="secondary" type="button" [disabled]="isSubmitting" (click)="close()">Fechar</button>
+        }
       </footer>
     </form>
   </section>

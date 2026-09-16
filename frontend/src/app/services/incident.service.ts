@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import {
   IncidentCreateRequest,
   IncidentResponse,
+  IncidentStatusUpdateRequest,
   IncidentUpdateRequest,
   PageIncidentResponse,
   Priority,
@@ -50,6 +51,10 @@ export class IncidentService {
 
   update(id: string, request: IncidentUpdateRequest): Observable<IncidentResponse> {
     return this.http.put<IncidentResponse>(`${this.resourceUrl}/${id}`, request);
+  }
+
+  updateStatus(id: string, request: IncidentStatusUpdateRequest): Observable<IncidentResponse> {
+    return this.http.patch<IncidentResponse>(`${this.resourceUrl}/${id}/status`, request);
   }
 
   delete(id: string): Observable<void> {
