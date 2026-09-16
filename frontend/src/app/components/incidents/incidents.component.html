@@ -71,6 +71,7 @@
               <th scope="col">Prioridade</th>
               <th scope="col">Status</th>
               <th scope="col">Data</th>
+              <th scope="col">Data Atualização</th>
               <th scope="col"><span class="visually-hidden">Ações</span></th>
             </tr>
           </thead>
@@ -81,6 +82,7 @@
                 <td><span class="badge priority-{{ incident.prioridade.toLowerCase() }}">{{ incident.prioridade }}</span></td>
                 <td><span class="badge status-{{ incident.status.toLowerCase() }}">{{ incident.status }}</span></td>
                 <td>{{ incident.dataAbertura | appDate }}</td>
+                <td>{{ incident.dataAtualizacao | appDate }}</td>
                 <td class="actions">
                   <button type="button" aria-label="Visualizar incident" (click)="viewIncident(incident)">Visualizar</button>
                   @if (hasWritePermission) {
