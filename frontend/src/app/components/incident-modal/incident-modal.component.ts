@@ -7,6 +7,7 @@ import { IncidentCreateRequest } from '../../models/request/incident-create-requ
 import { IncidentUpdateRequest } from '../../models/request/incident-update-request';
 import { IncidentService } from '../../services/incident.service';
 import { CommentService } from '../../services/comment.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-incident-modal',
@@ -19,6 +20,7 @@ export class IncidentModalComponent implements OnChanges {
   private readonly formBuilder = inject(FormBuilder);
   private readonly incidentService = inject(IncidentService);
   private readonly commentService = inject(CommentService);
+  private readonly authService = inject(AuthService);
 
   @Output() closed = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
@@ -42,6 +44,7 @@ export class IncidentModalComponent implements OnChanges {
   protected isLoadingComments = signal(false);
   protected isSubmittingComment = signal(false);
   protected commentErrorMessage = signal('');
+  protected readonly hasWritePermission = this.authService.hasWritePermission();
   protected readonly commentForm = this.formBuilder.nonNullable.group({
     mensagem: ['', [Validators.required, Validators.maxLength(5000)]]
   });

@@ -10,6 +10,7 @@ import {
   IncidentService
 } from '../../services/incident.service';
 import { IncidentModalComponent } from '../incident-modal/incident-modal.component';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-incidents',
@@ -22,6 +23,7 @@ export class IncidentsComponent implements OnInit {
 
   private readonly formBuilder = inject(FormBuilder);
   private readonly incidentService = inject(IncidentService);
+  private readonly authService = inject(AuthService);
 
   protected incidents = signal<IncidentResponse[]>([]);
   protected currentPage = signal(0);
@@ -33,6 +35,7 @@ export class IncidentsComponent implements OnInit {
   protected selectedIncident = signal<IncidentResponse | null>(null);
   protected modalMode = signal<'create' | 'edit' | 'view'>('create');
   protected deletingIncidentId = signal<string | null>(null);
+  protected readonly hasWritePermission = this.authService.hasWritePermission();
 
   protected readonly filterForm = this.formBuilder.nonNullable.group({
     q: '',

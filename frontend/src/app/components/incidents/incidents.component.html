@@ -9,7 +9,9 @@
         @if (totalElements() > 0) {
           <span class="total">{{ totalElements() }} registros</span>
         }
-        <button class="open-incident" type="button" (click)="openIncidentModal()">Abrir Incident</button>
+        @if (hasWritePermission) {
+          <button class="open-incident" type="button" (click)="openIncidentModal()">Abrir Incident</button>
+        }
       </div>
     </header>
 
@@ -81,15 +83,17 @@
                 <td>{{ incident.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</td>
                 <td class="actions">
                   <button type="button" aria-label="Visualizar incident" (click)="viewIncident(incident)">Visualizar</button>
-                  <button type="button" aria-label="Editar incident" (click)="editIncident(incident)">Editar</button>
-                  <button
-                    type="button"
-                    aria-label="Excluir incident"
-                    [disabled]="deletingIncidentId() === incident.id"
-                    (click)="deleteIncident(incident)"
-                  >
-                    {{ deletingIncidentId() === incident.id ? 'Excluindo...' : 'Excluir' }}
-                  </button>
+                  @if (hasWritePermission) {
+                    <button type="button" aria-label="Editar incident" (click)="editIncident(incident)">Editar</button>
+                    <button
+                      type="button"
+                      aria-label="Excluir incident"
+                      [disabled]="deletingIncidentId() === incident.id"
+                      (click)="deleteIncident(incident)"
+                    >
+                      {{ deletingIncidentId() === incident.id ? 'Excluindo...' : 'Excluir' }}
+                    </button>
+                  }
                 </td>
               </tr>
             }
