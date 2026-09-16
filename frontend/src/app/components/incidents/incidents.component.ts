@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
+import Swal from 'sweetalert2';
 
 import { IncidentResponse, Priority, Status } from '../../models';
 import {
@@ -30,6 +31,7 @@ export class IncidentsComponent implements OnInit {
   protected errorMessage = signal('');
   protected isModalOpen = signal(false);
   protected selectedIncident = signal<IncidentResponse | null>(null);
+  protected deletingIncidentId = signal<string | null>(null);
 
   protected readonly filterForm = this.formBuilder.nonNullable.group({
     q: '',
@@ -103,6 +105,52 @@ export class IncidentsComponent implements OnInit {
     this.selectedIncident.set(null);
     this.currentPage.set(0);
     this.loadIncidents();
+  }
+
+  protected async deleteIncident(incident: IncidentResponse): Promise<void> {
+    const result = await Swal.fire({
+      title: 'Excluir incident?',
+      text: `O incident "${incident.titulo}" será excluído permanentemente.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, excluir',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: 'rgb(163 29 33 / 1)',
+      cancelButtonColor: 'grey',
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    this.deletingIncidentId.set(incident.id);
+    this.errorMessage.set('');
+
+    this.incidentService.delete(incident.id).pipe(
+      finalize(() => this.deletingIncidentId.set(null))
+    ).subscribe({
+      next: () => {
+        if (this.incidents().length === 1 && this.currentPage() > 0) {
+          this.currentPage.update(page => page - 1);
+        }
+        void Swal.fire({
+          title: 'Excluído!',
+          text: 'O incident foi excluído com sucesso.',
+          icon: 'success',
+          confirmButtonColor: 'rgb(163 29 33 / 1)'
+        }).then(() => this.loadIncidents());
+      },
+      error: (error) => {
+        this.errorMessage.set('Não foi possível excluir o incident.');
+        console.error('Erro ao excluir incident:', error);
+        void Swal.fire({
+          title: 'Erro',
+          text: 'Não foi possível excluir o incident.',
+          icon: 'error',
+          confirmButtonColor: 'rgb(163 29 33 / 1)'
+        });
+      }
+    });
   }
 
   protected clearFilters(): void {

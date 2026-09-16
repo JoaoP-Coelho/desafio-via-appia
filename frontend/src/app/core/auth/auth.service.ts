@@ -21,4 +21,18 @@ export class AuthService {
     return localStorage.getItem(this.tokenKey);
   }
 
+  hasWritePermission(): boolean {
+    const token = this.getToken();
+        if (!token) return false;
+    else {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload && payload.permissions && payload.permissions.includes('write');
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        return false;
+      }
+    }
+  }
+
 }
