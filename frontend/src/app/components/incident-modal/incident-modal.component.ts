@@ -8,11 +8,12 @@ import { IncidentUpdateRequest } from '../../models/request/incident-update-requ
 import { IncidentService } from '../../services/incident.service';
 import { CommentService } from '../../services/comment.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { DateFormatPipe } from '../../pipes/date-format.pipe';
 
 @Component({
   selector: 'app-incident-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, DateFormatPipe],
   templateUrl: './incident-modal.component.html',
   styleUrl: './incident-modal.component.scss'
 })

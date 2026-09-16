@@ -11,11 +11,12 @@ import {
 } from '../../services/incident.service';
 import { IncidentModalComponent } from '../incident-modal/incident-modal.component';
 import { AuthService } from '../../core/auth/auth.service';
+import { DateFormatPipe } from '../../pipes/date-format.pipe';
 
 @Component({
   selector: 'app-incidents',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IncidentModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, IncidentModalComponent, DateFormatPipe],
   templateUrl: './incidents.component.html',
   styleUrl: './incidents.component.scss'
 })

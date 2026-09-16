@@ -75,7 +75,7 @@
                 <article class="comment">
                   <div class="comment-meta">
                     <strong>{{ comment.autor }}</strong>
-                    <time>{{ comment.dataCriacao | date: 'dd/MM/yyyy HH:mm' }}</time>
+                    <time>{{ comment.dataCriacao | appDate }}</time>
                   </div>
                   <p>{{ comment.mensagem }}</p>
                 </article>

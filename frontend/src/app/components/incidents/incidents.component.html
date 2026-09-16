@@ -80,7 +80,7 @@
                 <td class="title">{{ incident.titulo }}</td>
                 <td><span class="badge priority-{{ incident.prioridade.toLowerCase() }}">{{ incident.prioridade }}</span></td>
                 <td><span class="badge status-{{ incident.status.toLowerCase() }}">{{ incident.status }}</span></td>
-                <td>{{ incident.dataAbertura | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ incident.dataAbertura | appDate }}</td>
                 <td class="actions">
                   <button type="button" aria-label="Visualizar incident" (click)="viewIncident(incident)">Visualizar</button>
                   @if (hasWritePermission) {
