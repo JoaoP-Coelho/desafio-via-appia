@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.incidentmanager.dto.request.IncidentCreateRequest;
 import com.incidentmanager.dto.request.IncidentUpdateRequest;
+import com.incidentmanager.dto.request.IncidentStatusUpdateRequest;
 import com.incidentmanager.dto.response.IncidentResponse;
 import com.incidentmanager.enums.Priority;
 import com.incidentmanager.enums.Status;
@@ -73,6 +75,17 @@ public class IncidentController {
             @Valid @RequestBody IncidentUpdateRequest request) {
 
         IncidentResponse response = incidentService.update(id, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasAuthority('WRITER')")
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<IncidentResponse> updateStatus(
+            @PathVariable UUID id,
+            @Valid @RequestBody IncidentStatusUpdateRequest request) {
+
+        IncidentResponse response = incidentService.updateStatus(id, request.status());
 
         return ResponseEntity.ok(response);
     }

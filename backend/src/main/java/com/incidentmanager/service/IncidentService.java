@@ -94,6 +94,17 @@ public class IncidentService {
         return incidentMapper.toResponse(updatedIncident);
     }
 
+    public IncidentResponse updateStatus(UUID id, Status status) {
+        Incident incident = incidentRepository.findIncidentById(id);
+
+        incident.setStatus(status);
+        incident.setDataAtualizacao(LocalDateTime.now());
+
+        Incident updatedIncident = incidentRepository.save(incident);
+
+        return incidentMapper.toResponse(updatedIncident);
+    }
+
     public void delete(UUID id) {
         Incident incident = incidentRepository.findIncidentById(id);
         incidentRepository.delete(incident);
