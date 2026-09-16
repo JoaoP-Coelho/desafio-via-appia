@@ -21,6 +21,21 @@ export class AuthService {
     return localStorage.getItem(this.tokenKey);
   }
 
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+
+    if (!token) {
+      return false;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])) as { exp?: number };
+      return !payload.exp || payload.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
+  }
+
   hasWritePermission(): boolean {
     const token = this.getToken();
         if (!token) return false;
