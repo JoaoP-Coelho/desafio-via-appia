@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
 import { Login } from '../../models/auth/login';
+import { Role } from '../../models/enums/role';
 import { API_BASE_URL } from '../config/api.config';
 
 @Injectable({ providedIn: 'root' })
@@ -29,25 +30,37 @@ export class AuthService {
     }
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1])) as { exp?: number };
+      const payload = this.getPayload(token) as { exp?: number };
       return !payload.exp || payload.exp * 1000 > Date.now();
     } catch {
       return false;
     }
   }
 
-  hasWritePermission(): boolean {
+  getRole(): Role | null {
     const token = this.getToken();
-        if (!token) return false;
-    else {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload && payload.permissions && payload.permissions.includes('write');
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        return false;
-      }
+
+    if (!token) {
+      return null;
     }
+
+    try {
+      const payload = this.getPayload(token) as { role?: Role };
+      return payload.role ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  hasWritePermission(): boolean {
+    return this.isAuthenticated() && this.getRole() === 'WRITER';
+  }
+
+  private getPayload(token: string): Record<string, unknown> {
+    const encodedPayload = token.split('.')[1]
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    return JSON.parse(atob(encodedPayload));
   }
 
 }
