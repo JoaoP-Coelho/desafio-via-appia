@@ -1,0 +1,246 @@
+:host {
+  display: block;
+}
+
+.modal-backdrop {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(58 23 25 / 45%);
+}
+
+.modal {
+  width: min(100%, 38rem);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  padding: 1.75rem;
+  border: 1px solid #ead1d2;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1.5rem 3rem rgb(58 23 25 / 22%);
+}
+
+.modal-header,
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.modal-header {
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: rgb(163 29 33 / 1);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 0;
+  color: #3a1719;
+  font-size: 1.5rem;
+}
+
+.close-button {
+  padding: 0.15rem 0.5rem;
+  border: 0;
+  background: transparent;
+  color: #6b4a4c;
+  cursor: pointer;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+label {
+  margin-top: 0.65rem;
+  color: #512326;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 0.8rem;
+  border: 1px solid #ddc2c3;
+  border-radius: 5px;
+  background: #fff;
+  color: #3a1719;
+  font: inherit;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgb(163 29 33 / 1);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgb(163 29 33 / 14%);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: 1rem;
+}
+
+.form-grid > div {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+}
+
+small {
+  color: #6b4a4c;
+  font-size: 0.75rem;
+}
+
+.field-error,
+.form-error {
+  color: #b42318;
+  font-size: 0.78rem;
+}
+
+.form-error {
+  margin: 0.5rem 0 0;
+}
+
+.comments {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #ead1d2;
+}
+
+.comments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.comments-header h3 {
+  margin: 0;
+  color: #3a1719;
+  font-size: 1rem;
+}
+
+.comments-header span {
+  color: #6b4a4c;
+  font-size: 0.8rem;
+}
+
+.comments-list {
+  display: grid;
+  gap: 0.65rem;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.comment {
+  padding: 0.75rem;
+  border: 1px solid #f0dfe0;
+  border-radius: 5px;
+  background: #fff8f8;
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #6b4a4c;
+  font-size: 0.75rem;
+}
+
+.comment-meta strong {
+  color: #512326;
+}
+
+.comment p {
+  margin: 0.45rem 0 0;
+  color: #3a1719;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.comments-feedback {
+  margin: 0;
+  color: #6b4a4c;
+  font-size: 0.85rem;
+}
+
+.comments-feedback.error {
+  color: #b42318;
+}
+
+.comment-form {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.comment-submit {
+  justify-self: end;
+  padding: 0.65rem 0.9rem;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.modal-actions {
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+
+.modal-actions button {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgb(163 29 33 / 1);
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.modal-actions .primary {
+  background: rgb(163 29 33 / 1);
+  color: #fff;
+}
+
+.modal-actions .secondary {
+  border-color: #ddc2c3;
+  background: #fff;
+  color: #6b4a4c;
+}
+
+.modal-actions button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+@media (max-width: 36rem) {
+  .modal {
+    padding: 1.25rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}

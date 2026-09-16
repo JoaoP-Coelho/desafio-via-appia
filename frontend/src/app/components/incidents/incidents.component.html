@@ -1,0 +1,124 @@
+<main class="incidents-page">
+  <section class="incidents-content" aria-labelledby="incidents-title">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Overview</p>
+        <h1 id="incidents-title">Incidents</h1>
+      </div>
+      <div class="header-actions">
+        @if (totalElements() > 0) {
+          <span class="total">{{ totalElements() }} registros</span>
+        }
+        @if (hasWritePermission) {
+          <button class="open-incident" type="button" (click)="openIncidentModal()">Abrir Incident</button>
+        }
+      </div>
+    </header>
+
+    <form class="filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+      <label>
+        Buscar
+        <input type="search" formControlName="q" placeholder="Título ou descrição" />
+      </label>
+
+      <label>
+        Status
+        <select formControlName="status">
+          <option value="">Todos</option>
+          <option value="ABERTA">Aberta</option>
+          <option value="EM_ANDAMENTO">Em andamento</option>
+          <option value="RESOLVIDA">Resolvida</option>
+          <option value="CANCELADA">Cancelada</option>
+        </select>
+      </label>
+
+      <label>
+        Prioridade
+        <select formControlName="prioridade">
+          <option value="">Todas</option>
+          <option value="BAIXA">Baixa</option>
+          <option value="MEDIA">Média</option>
+          <option value="ALTA">Alta</option>
+        </select>
+      </label>
+
+      <label>
+        Por página
+        <select formControlName="size">
+          <option [ngValue]="5">5</option>
+          <option [ngValue]="10">10</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="submit">Filtrar</button>
+        <button type="button" class="secondary" (click)="clearFilters()">Limpar</button>
+      </div>
+    </form>
+
+    @if (isLoading()) {
+      <p class="feedback">Carregando incidents...</p>
+    } @else if (errorMessage()) {
+      <p class="feedback error" role="alert">{{ errorMessage() }}</p>
+    } @else if (incidents().length === 0) {
+      <p class="feedback">Nenhum incident encontrado.</p>
+    } @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Título</th>
+              <th scope="col">Prioridade</th>
+              <th scope="col">Status</th>
+              <th scope="col">Data</th>
+              <th scope="col">Data Atualização</th>
+              <th scope="col"><span class="visually-hidden">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (incident of incidents(); track incident.id) {
+              <tr>
+                <td class="title">{{ incident.titulo }}</td>
+                <td><span class="badge priority-{{ incident.prioridade.toLowerCase() }}">{{ incident.prioridade }}</span></td>
+                <td><span class="badge status-{{ incident.status.toLowerCase() }}">{{ incident.status }}</span></td>
+                <td>{{ incident.dataAbertura | appDate }}</td>
+                <td>{{ incident.dataAtualizacao | appDate }}</td>
+                <td class="actions">
+                  <button type="button" aria-label="Visualizar incident" (click)="viewIncident(incident)">Visualizar</button>
+                  @if (hasWritePermission) {
+                    <button type="button" aria-label="Editar incident" (click)="editIncident(incident)">Editar</button>
+                    <button
+                      type="button"
+                      aria-label="Excluir incident"
+                      [disabled]="deletingIncidentId() === incident.id"
+                      (click)="deleteIncident(incident)"
+                    >
+                      {{ deletingIncidentId() === incident.id ? 'Excluindo...' : 'Excluir' }}
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="pagination" aria-label="Paginação">
+        <span>Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
+        <div>
+          <button type="button" (click)="previousPage()" [disabled]="currentPage() === 0 || isLoading()">Anterior</button>
+          <button type="button" (click)="nextPage()" [disabled]="currentPage() >= totalPages() - 1 || isLoading()">Próxima</button>
+        </div>
+      </footer>
+    }
+  </section>
+</main>
+
+@if (isModalOpen()) {
+  <app-incident-modal
+    [incident]="selectedIncident()"
+    [mode]="modalMode()"
+    (closed)="closeIncidentModal()"
+    (saved)="handleIncidentCreated()"
+  />
+}

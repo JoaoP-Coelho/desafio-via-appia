@@ -1,0 +1,116 @@
+<div class="modal-backdrop" (click)="close()">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div>
+        <p class="eyebrow">{{ isViewMode ? 'Visualização' : (isEditMode ? 'Editar registro' : 'Novo registro') }}</p>
+        <h2 id="modal-title">{{ isViewMode ? 'Visualizar Incident' : (isEditMode ? 'Editar Incident' : 'Abrir Incident') }}</h2>
+      </div>
+      <button class="close-button" type="button" aria-label="Fechar modal" (click)="close()">&times;</button>
+    </header>
+
+    <form [formGroup]="incidentForm" (ngSubmit)="submit()" novalidate>
+      <label for="titulo">Título</label>
+      <input id="titulo" type="text" formControlName="titulo" placeholder="Descreva o incident" [readonly]="isViewMode" />
+      @if (incidentForm.controls.titulo.touched && incidentForm.controls.titulo.invalid) {
+        <span class="field-error">Informe um título entre 5 e 120 caracteres.</span>
+      }
+
+      <label for="descricao">Descrição</label>
+      <textarea id="descricao" rows="4" formControlName="descricao" placeholder="Detalhe o que aconteceu" [readonly]="isViewMode"></textarea>
+
+      <div class="form-grid">
+        <div>
+          <label for="prioridade">Prioridade</label>
+          <select id="prioridade" formControlName="prioridade" [disabled]="isViewMode">
+            @for (priority of priorities; track priority) {
+              <option [value]="priority">{{ priority }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label for="responsavelEmail">E-mail do responsável</label>
+          <input id="responsavelEmail" type="email" formControlName="responsavelEmail" placeholder="responsavel@empresa.com" [readonly]="isViewMode" />
+          @if (incidentForm.controls.responsavelEmail.touched && incidentForm.controls.responsavelEmail.invalid) {
+            <span class="field-error">Informe um e-mail válido.</span>
+          }
+        </div>
+
+        @if (isEditMode || isViewMode) {
+          <div>
+            <label for="status">Status</label>
+            <select id="status" formControlName="status" [disabled]="isViewMode && !hasWritePermission" (change)="updateStatus()">
+              @for (status of statuses; track status) {
+                <option [value]="status">{{ status }}</option>
+              }
+            </select>
+          </div>
+        }
+      </div>
+
+      <label for="tags">Tags</label>
+      <input id="tags" type="text" formControlName="tags" placeholder="produção, acesso, urgente" [readonly]="isViewMode" />
+      <small>Separe as tags por vírgula.</small>
+
+      @if (errorMessage()) {
+        <p class="form-error" role="alert">{{ errorMessage() }}</p>
+      }
+
+      @if (isViewMode) {
+        <section class="comments" aria-labelledby="comments-title">
+          <div class="comments-header">
+            <h3 id="comments-title">Comentários</h3>
+            <span>{{ comments().length }}</span>
+          </div>
+
+          @if (isLoadingComments()) {
+            <p class="comments-feedback">Carregando comentários...</p>
+          } @else if (commentErrorMessage()) {
+            <p class="comments-feedback error" role="alert">{{ commentErrorMessage() }}</p>
+          } @else if (comments().length === 0) {
+            <p class="comments-feedback">Nenhum comentário ainda.</p>
+          } @else {
+            <div class="comments-list">
+              @for (comment of comments(); track comment.id) {
+                <article class="comment">
+                  <div class="comment-meta">
+                    <strong>{{ comment.autor }}</strong>
+                    <time>{{ comment.dataCriacao | appDate }}</time>
+                  </div>
+                  <p>{{ comment.mensagem }}</p>
+                </article>
+              }
+            </div>
+          }
+
+          @if (hasWritePermission) {
+            <form class="comment-form" [formGroup]="commentForm" (ngSubmit)="submitComment()">
+              <label for="mensagem">Adicionar comentário</label>
+              <textarea id="mensagem" rows="3" formControlName="mensagem" placeholder="Escreva um comentário..."></textarea>
+              @if (commentForm.controls.mensagem.touched && commentForm.controls.mensagem.invalid) {
+                <span class="field-error">Informe um comentário.</span>
+              }
+              @if (commentErrorMessage()) {
+                <p class="form-error" role="alert">{{ commentErrorMessage() }}</p>
+              }
+              <button class="primary comment-submit" type="submit" [disabled]="isSubmittingComment()">
+                {{ isSubmittingComment() ? 'Enviando...' : 'Comentar' }}
+              </button>
+            </form>
+          }
+        </section>
+      }
+
+      <footer class="modal-actions">
+        @if (!isViewMode) {
+          <button class="secondary" type="button" [disabled]="isSubmitting()" (click)="close()">Cancelar</button>
+          <button class="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Salvando...' : (isEditMode ? 'Salvar alterações' : 'Abrir Incident') }}
+          </button>
+        } @else {
+          <button class="secondary" type="button" [disabled]="isSubmitting()" (click)="close()">Fechar</button>
+        }
+      </footer>
+    </form>
+  </section>
+</div>

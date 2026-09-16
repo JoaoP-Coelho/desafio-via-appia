@@ -1,0 +1,45 @@
+<section class="stats-page">
+  <div class="stats-content">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Overview</p>
+        <h1>Stats</h1>
+      </div>
+      @if (!isLoading() && !errorMessage()) {
+        <span class="total">{{ totalIncidents() }} incidents</span>
+      }
+    </header>
+
+    @if (isLoading()) {
+      <p class="feedback">Carregando estatísticas...</p>
+    } @else if (errorMessage()) {
+      <p class="feedback error" role="alert">{{ errorMessage() }}</p>
+    } @else {
+      <div class="stats-grid">
+        <section class="stats-panel" aria-labelledby="status-title">
+          <h2 id="status-title">Por status</h2>
+          <dl>
+            @for (status of statuses; track status) {
+              <div class="stat-row">
+                <dt>{{ statusLabel(status) }}</dt>
+                <dd>{{ statusValue(status) }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+
+        <section class="stats-panel" aria-labelledby="priority-title">
+          <h2 id="priority-title">Por prioridade</h2>
+          <dl>
+            @for (priority of priorities; track priority) {
+              <div class="stat-row">
+                <dt>{{ priorityLabel(priority) }}</dt>
+                <dd>{{ priorityValue(priority) }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+      </div>
+    }
+  </div>
+</section>
