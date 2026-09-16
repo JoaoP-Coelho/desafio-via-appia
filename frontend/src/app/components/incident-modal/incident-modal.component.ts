@@ -9,6 +9,7 @@ import { IncidentService } from '../../services/incident.service';
 import { CommentService } from '../../services/comment.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
+import { normalizeIncidentFormValue } from '../../utils/incident-form-normalizer';
 
 @Component({
   selector: 'app-incident-modal',
@@ -177,9 +178,8 @@ export class IncidentModalComponent implements OnChanges {
       return;
     }
 
-    const values = this.incidentForm.getRawValue();
+    const values = normalizeIncidentFormValue(this.incidentForm.getRawValue());
     this.isSubmitting.set(true);
-    const tags = values.tags.split(',').map(tag => tag.trim()).filter(Boolean);
     if (this.isViewMode && this.incident) {
       this.isSubmitting.set(true);
       this.incidentService.updateStatus(this.incident.id, { status: values.status }).subscribe({
@@ -196,11 +196,11 @@ export class IncidentModalComponent implements OnChanges {
     }
 
     const commonFields = {
-      titulo: values.titulo.trim(),
-      descricao: values.descricao.trim() || undefined,
+      titulo: values.titulo,
+      descricao: values.descricao || undefined,
       prioridade: values.prioridade,
-      responsavelEmail: values.responsavelEmail.trim(),
-      tags
+      responsavelEmail: values.responsavelEmail,
+      tags: values.tags
     };
     const request: IncidentCreateRequest | IncidentUpdateRequest = this.isEditMode
       ? { ...commonFields, status: values.status }
