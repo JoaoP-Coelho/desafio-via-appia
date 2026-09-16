@@ -52,18 +52,61 @@
       <input id="tags" type="text" formControlName="tags" placeholder="produção, acesso, urgente" [readonly]="isViewMode" />
       <small>Separe as tags por vírgula.</small>
 
-      @if (errorMessage) {
-        <p class="form-error" role="alert">{{ errorMessage }}</p>
+      @if (errorMessage()) {
+        <p class="form-error" role="alert">{{ errorMessage() }}</p>
+      }
+
+      @if (isViewMode) {
+        <section class="comments" aria-labelledby="comments-title">
+          <div class="comments-header">
+            <h3 id="comments-title">Comentários</h3>
+            <span>{{ comments().length }}</span>
+          </div>
+
+          @if (isLoadingComments()) {
+            <p class="comments-feedback">Carregando comentários...</p>
+          } @else if (commentErrorMessage()) {
+            <p class="comments-feedback error" role="alert">{{ commentErrorMessage() }}</p>
+          } @else if (comments().length === 0) {
+            <p class="comments-feedback">Nenhum comentário ainda.</p>
+          } @else {
+            <div class="comments-list">
+              @for (comment of comments(); track comment.id) {
+                <article class="comment">
+                  <div class="comment-meta">
+                    <strong>{{ comment.autor }}</strong>
+                    <time>{{ comment.dataCriacao | date: 'dd/MM/yyyy HH:mm' }}</time>
+                  </div>
+                  <p>{{ comment.mensagem }}</p>
+                </article>
+              }
+            </div>
+          }
+
+          <form class="comment-form" [formGroup]="commentForm" (ngSubmit)="submitComment()">
+            <label for="mensagem">Adicionar comentário</label>
+            <textarea id="mensagem" rows="3" formControlName="mensagem" placeholder="Escreva um comentário..."></textarea>
+            @if (commentForm.controls.mensagem.touched && commentForm.controls.mensagem.invalid) {
+              <span class="field-error">Informe um comentário.</span>
+            }
+            @if (commentErrorMessage()) {
+              <p class="form-error" role="alert">{{ commentErrorMessage() }}</p>
+            }
+            <button class="primary comment-submit" type="submit" [disabled]="isSubmittingComment()">
+              {{ isSubmittingComment() ? 'Enviando...' : 'Comentar' }}
+            </button>
+          </form>
+        </section>
       }
 
       <footer class="modal-actions">
         @if (!isViewMode) {
-          <button class="secondary" type="button" [disabled]="isSubmitting" (click)="close()">Cancelar</button>
-          <button class="primary" type="submit" [disabled]="isSubmitting">
-            {{ isSubmitting ? 'Salvando...' : (isEditMode ? 'Salvar alterações' : 'Abrir Incident') }}
+          <button class="secondary" type="button" [disabled]="isSubmitting()" (click)="close()">Cancelar</button>
+          <button class="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Salvando...' : (isEditMode ? 'Salvar alterações' : 'Abrir Incident') }}
           </button>
         } @else {
-          <button class="secondary" type="button" [disabled]="isSubmitting" (click)="close()">Fechar</button>
+          <button class="secondary" type="button" [disabled]="isSubmitting()" (click)="close()">Fechar</button>
         }
       </footer>
     </form>

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { IncidentResponse, Priority, Status } from '../../models';
+import { CommentResponse, IncidentResponse, Priority, Status } from '../../models';
 import { IncidentCreateRequest } from '../../models/request/incident-create-request';
 import { IncidentUpdateRequest } from '../../models/request/incident-update-request';
 import { IncidentService } from '../../services/incident.service';
+import { CommentService } from '../../services/comment.service';
 
 @Component({
   selector: 'app-incident-modal',
@@ -17,6 +18,7 @@ import { IncidentService } from '../../services/incident.service';
 export class IncidentModalComponent implements OnChanges {
   private readonly formBuilder = inject(FormBuilder);
   private readonly incidentService = inject(IncidentService);
+  private readonly commentService = inject(CommentService);
 
   @Output() closed = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
@@ -34,8 +36,15 @@ export class IncidentModalComponent implements OnChanges {
     tags: ['']
   });
 
-  protected isSubmitting = false;
-  protected errorMessage = '';
+  protected isSubmitting = signal(false);
+  protected errorMessage = signal('');
+  protected comments = signal<CommentResponse[]>([]);
+  protected isLoadingComments = signal(false);
+  protected isSubmittingComment = signal(false);
+  protected commentErrorMessage = signal('');
+  protected readonly commentForm = this.formBuilder.nonNullable.group({
+    mensagem: ['', [Validators.required, Validators.maxLength(5000)]]
+  });
 
   protected get isEditMode(): boolean {
     return this.mode === 'edit';
@@ -68,7 +77,65 @@ export class IncidentModalComponent implements OnChanges {
           tags: ''
         });
       }
+
+      if (this.isViewMode && this.incident) {
+        this.loadComments();
+      } else {
+        this.comments.set([]);
+      }
     }
+  }
+
+  private loadComments(): void {
+    if (!this.incident) {
+      return;
+    }
+
+    this.isLoadingComments.set(true);
+    this.commentErrorMessage.set('');
+    this.commentService.getByIncident(this.incident.id).subscribe({
+      next: (comments) => {
+        this.comments.set(comments);
+        this.isLoadingComments.set(false);
+      },
+      error: (error) => {
+        this.isLoadingComments.set(false);
+        this.commentErrorMessage.set('Não foi possível carregar os comentários.');
+        console.error('Erro ao carregar comentários:', error);
+      }
+    });
+  }
+
+  protected submitComment(): void {
+    if (!this.incident || this.commentForm.invalid) {
+      this.commentForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmittingComment.set(true);
+    this.commentErrorMessage.set('');
+    const request = {
+      mensagem: this.commentForm.controls.mensagem.value.trim()
+    };
+
+    if (!request.mensagem) {
+      this.commentForm.markAllAsTouched();
+      this.isSubmittingComment.set(false);
+      return;
+    }
+
+    this.commentService.create(this.incident.id, request).subscribe({
+      next: (comment) => {
+        this.comments.update(current => [...current, comment]);
+        this.commentForm.reset({ mensagem: '' });
+        this.isSubmittingComment.set(false);
+      },
+      error: (error) => {
+        this.isSubmittingComment.set(false);
+        this.commentErrorMessage.set('Não foi possível adicionar o comentário.');
+        console.error('Erro ao criar comentário:', error);
+      }
+    });
   }
 
   private setFormState(): void {
@@ -93,13 +160,13 @@ export class IncidentModalComponent implements OnChanges {
   }
 
   protected close(): void {
-    if (!this.isSubmitting) {
+    if (!this.isSubmitting()) {
       this.closed.emit();
     }
   }
 
   protected submit(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
 
     if (this.incidentForm.invalid) {
       this.incidentForm.markAllAsTouched();
@@ -107,18 +174,18 @@ export class IncidentModalComponent implements OnChanges {
     }
 
     const values = this.incidentForm.getRawValue();
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
     const tags = values.tags.split(',').map(tag => tag.trim()).filter(Boolean);
     if (this.isViewMode && this.incident) {
-      this.isSubmitting = true;
+      this.isSubmitting.set(true);
       this.incidentService.updateStatus(this.incident.id, { status: values.status }).subscribe({
         next: () => {
-          this.isSubmitting = false;
+          this.isSubmitting.set(false);
           this.saved.emit();
         },
         error: () => {
-          this.isSubmitting = false;
-          this.errorMessage = 'Não foi possível atualizar o status do incident.';
+          this.isSubmitting.set(false);
+          this.errorMessage.set('Não foi possível atualizar o status do incident.');
         }
       });
       return;
@@ -140,14 +207,14 @@ export class IncidentModalComponent implements OnChanges {
 
     request$.subscribe({
       next: () => {
-        this.isSubmitting = false;
+        this.isSubmitting.set(false);
         this.saved.emit();
       },
       error: () => {
-        this.isSubmitting = false;
-        this.errorMessage = this.isEditMode
+        this.isSubmitting.set(false);
+        this.errorMessage.set(this.isEditMode
           ? 'Não foi possível atualizar o incident.'
-          : 'Não foi possível cadastrar o incident.';
+          : 'Não foi possível cadastrar o incident.');
       }
     });
   }
