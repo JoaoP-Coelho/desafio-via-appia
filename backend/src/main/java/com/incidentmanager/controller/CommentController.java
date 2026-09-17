@@ -15,12 +15,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import com.incidentmanager.dto.request.CommentCreateRequest;
 import com.incidentmanager.dto.response.CommentResponse;
 import com.incidentmanager.service.CommentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/incidents")
 @Validated
+@Tag(name = "Comentários", description = "Endpoints que tratam de comentários relacionados a incidentes")
+@SecurityRequirement(name = "bearerAuth")
 public class CommentController {
 
     private final CommentService commentService;
