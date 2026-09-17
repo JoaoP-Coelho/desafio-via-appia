@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.incidentmanager.dto.request.IncidentCreateRequest;
 import com.incidentmanager.dto.request.IncidentUpdateRequest;
@@ -31,6 +34,8 @@ import jakarta.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/api/incidents")
+@Tag(name = "Incidentes", description = "Endpoints que tratam de incidentes")
+@SecurityRequirement(name = "bearerAuth")
 @Validated
 public class IncidentController {
 
@@ -41,6 +46,7 @@ public class IncidentController {
     }
 
     @PreAuthorize("hasAuthority('WRITER')")
+    @Operation(summary = "Cria um novo incidente", description = "Cria um novo incidente com base nas informações fornecidas.")
     @PostMapping
     public ResponseEntity<IncidentResponse> create(
             @Valid @RequestBody IncidentCreateRequest request) {
@@ -49,6 +55,7 @@ public class IncidentController {
     }
 
     @PreAuthorize("hasAnyAuthority('READ_ONLY', 'WRITER')")
+    @Operation(summary = "Busca incidentes", description = "Busca incidentes com base nos filtros e com busca paginada.")
     @GetMapping
     public ResponseEntity<Page<IncidentResponse>> search(
             @RequestParam(required = false) Status status,
@@ -62,6 +69,7 @@ public class IncidentController {
     }
 
     @PreAuthorize("hasAnyAuthority('READ_ONLY', 'WRITER')")
+    @Operation(summary = "Busca incidente por ID", description = "Busca um incidente em específico pelo seu ID.")
     @GetMapping("/{id}")
     public ResponseEntity<IncidentResponse> getById(@PathVariable UUID id) {
         IncidentResponse incidentResponse = incidentService.getById(id);
@@ -69,6 +77,7 @@ public class IncidentController {
     }
 
     @PreAuthorize("hasAuthority('WRITER')")
+    @Operation(summary = "Atualiza um incidente", description = "Atualiza as informações de um incidente existente.")
     @PutMapping("/{id}")
     public ResponseEntity<IncidentResponse> update(
             @PathVariable UUID id,
@@ -80,6 +89,7 @@ public class IncidentController {
     }
 
     @PreAuthorize("hasAuthority('WRITER')")
+    @Operation(summary = "Atualiza o status de um incidente", description = "Atualiza o status de um incidente existente.")
     @PatchMapping("/{id}/status")
     public ResponseEntity<IncidentResponse> updateStatus(
             @PathVariable UUID id,
@@ -91,6 +101,7 @@ public class IncidentController {
     }
 
     @PreAuthorize("hasAuthority('WRITER')")
+    @Operation(summary = "Deleta um incidente", description = "Deleta um incidente existente pelo seu ID, junto com todos seus comentários.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         incidentService.delete(id);

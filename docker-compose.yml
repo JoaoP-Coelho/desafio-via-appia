@@ -27,5 +27,15 @@ services:
     depends_on:
       - db
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: incident_manager_frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
