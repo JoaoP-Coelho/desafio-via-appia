@@ -16,7 +16,7 @@ Rode o comando: cp .env.example .env para criar o .env.
 
 E para geração da chave JWT utilize o site https://jwtsecretkeygenerator.com gerando um Standard Secret Key, com configuração padrão.
 
-Por fim, pode ser executado o `docker-compose upp --build` para rodar o projeto.
+Por fim, pode ser executado o `docker-compose up --build` para rodar o projeto.
 
 Seeds gerados via script SQL:
 
