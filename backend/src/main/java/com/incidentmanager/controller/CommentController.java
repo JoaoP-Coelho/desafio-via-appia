@@ -16,7 +16,6 @@ import com.incidentmanager.dto.request.CommentCreateRequest;
 import com.incidentmanager.dto.response.CommentResponse;
 import com.incidentmanager.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
@@ -25,7 +24,6 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/incidents")
 @Validated
 @Tag(name = "Comentários", description = "Endpoints que tratam de comentários relacionados a incidentes")
-@SecurityRequirement(name = "bearerAuth")
 public class CommentController {
 
     private final CommentService commentService;
@@ -35,6 +33,7 @@ public class CommentController {
     }
 
     @PreAuthorize("hasAuthority('WRITER')")
+    @Operation(summary = "Cria um comentário em um incidente", description = "Cria um comentário associado a um incidente.")
     @PostMapping("/{incidentId}/comments")
     public ResponseEntity<CommentResponse> create(
             @PathVariable UUID incidentId,
@@ -44,6 +43,7 @@ public class CommentController {
     }
 
     @PreAuthorize("hasAnyAuthority('READ_ONLY', 'WRITER')")
+    @Operation(summary = "Busca comentários de um incidente", description = "Retorna todos os comentários associados a um incidente.")
     @GetMapping("/{incidentId}/comments")
     public ResponseEntity<List<CommentResponse>> getByIncident(
             @PathVariable UUID incidentId) {
